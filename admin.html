@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - La Sexta Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-panel {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(255, 102, 0, 0.5);
+            border-radius: var(--border-radius-md);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background: rgba(255, 102, 0, 0.1);
+            border-color: var(--color-primary);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            border-radius: var(--border-radius-md);
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .danger-btn {
+            background: rgba(255, 50, 50, 0.2);
+            color: #ff5555;
+            border: 1px solid rgba(255, 50, 50, 0.4);
+        }
+
+        .danger-btn:hover {
+            background: rgba(255, 50, 50, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-effects">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+    </div>
+
+    <div class="app-container admin-panel">
+        <header class="app-header">
+            <h1 class="logo">Admin Panel</h1>
+            <p class="subtitle">Gestión de Fondo de Banner</p>
+        </header>
+
+        <!-- Login Section -->
+        <main id="loginSection" class="main-content">
+            <div class="glass-panel">
+                <form id="loginForm" class="input-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" placeholder="Usuario" autocomplete="off" required>
+
+                    <label for="password" style="margin-top: 1rem;">Contraseña</label>
+                    <!-- Permitiendo tipo texto en CSS temporal -->
+                    <input type="password" id="password" placeholder="••••••••"
+                        style="width: 100%; padding: 1rem 1.25rem; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: white; font-size: 1.1rem; outline: none; transition: 0.3s;"
+                        required>
+
+                    <button type="submit" class="primary-btn" style="margin-top: 1.5rem;">Ingresar</button>
+                    <p id="loginError" style="color: #ff5555; font-size: 0.9rem; text-align: center; margin-top: 1rem;"
+                        class="hidden">Credenciales incorrectas.</p>
+                </form>
+            </div>
+        </main>
+
+        <!-- Dashboard Section -->
+        <main id="dashboardSection" class="main-content hidden">
+            <!-- Pestaña 1: Configuración de Fondo -->
+            <div class="glass-panel" style="margin-bottom: 2rem;">
+                <div class="input-group">
+                    <h3>1. Fondo del Banner (1500x500 px)</h3>
+                    <label class="upload-area" for="bgUpload">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)"
+                            stroke-width="2" style="margin-bottom: 1rem;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>Haz clic para subir una nueva imagen</p>
+                        <label class="upload-area" for="bgUpload">
+                            <!-- ... (same svg) ... -->
+                            <p>Fondo para el Banner</p>
+                        </label>
+                        <input type="file" id="bgUpload" class="file-input" accept="image/png, image/jpeg, image/jpg">
+                        <img id="bgPreview" class="preview-image" alt="Vista previa del fondo del banner">
+                        <button id="saveBgBtn" class="primary-btn hidden" style="margin-top: 1rem;">Guardar Fondo de
+                            Banner</button>
+                        <button id="resetBgBtn" class="primary-btn danger-btn" style="margin-top: 1rem;">Restaurar Fondo
+                            Banner Original</button>
+
+                        <hr style="border: 1px solid rgba(255,255,255,0.1); margin: 2rem 0;">
+
+                        <h3>1B. Fondo de la Página Web (Opacidad 8%)</h3>
+                        <p style="color: var(--color-text-sub); font-size: 0.9rem; margin-bottom: 1rem;">Reemplaza la
+                            imagen de fondo tipo Brasil.</p>
+                        <label class="upload-area" for="webBgUpload">
+                            <p>Haz clic para subir fondo de la Web</p>
+                        </label>
+                        <input type="file" id="webBgUpload" class="file-input"
+                            accept="image/png, image/jpeg, image/jpg">
+                        <img id="webBgPreview" class="preview-image" alt="Vista previa del fondo de la web">
+                        <button id="saveWebBgBtn" class="primary-btn hidden" style="margin-top: 1rem;">Guardar Fondo
+                            Web</button>
+                        <button id="resetWebBgBtn" class="primary-btn danger-btn" style="margin-top: 1rem;">Restaurar
+                            Fondo Web Original</button>
+                </div>
+            </div>
+
+            <!-- Pestaña 2: Configuración de Tema (Theme Builder) -->
+            <div class="glass-panel">
+                <div class="input-group">
+                    <h3>2. Panel de Apariencia (Estilos y Textos)</h3>
+                    <p style="color: var(--color-text-sub); font-size: 0.9rem; margin-bottom: 1.5rem;">Cualquier cambio
+                        aquí se aplicará a toda la web y a los banners generados.</p>
+
+                    <h4 style="margin-bottom: 0.5rem; color: var(--color-primary);">🎨 Colores Principales</h4>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label for="themeColorPrimary" style="font-size: 0.8rem;">Color Web Global
+                                (Flares/Botones)</label>
+                            <input type="color" id="themeColorPrimary" value="#ff5500"
+                                style="width: 100%; height: 40px; cursor: pointer;">
+                        </div>
+                        <div>
+                            <label for="themeTextShadow" style="font-size: 0.8rem;">Color Sombra Texto Banner</label>
+                            <input type="color" id="themeTextShadow" value="#ff3200"
+                                style="width: 100%; height: 40px; cursor: pointer;">
+                        </div>
+                        <div>
+                            <label for="themeGradTop" style="font-size: 0.8rem;">Gradiente Letras Banner
+                                (Arriba)</label>
+                            <input type="color" id="themeGradTop" value="#ff9900"
+                                style="width: 100%; height: 40px; cursor: pointer;">
+                        </div>
+                        <div>
+                            <label for="themeGradMid" style="font-size: 0.8rem;">Gradiente Letras Banner (Medio)</label>
+                            <input type="color" id="themeGradMid" value="#ff4400"
+                                style="width: 100%; height: 40px; cursor: pointer;">
+                        </div>
+                        <div>
+                            <label for="themeGradBot" style="font-size: 0.8rem;">Gradiente Letras Banner (Abajo)</label>
+                            <input type="color" id="themeGradBot" value="#990000"
+                                style="width: 100%; height: 40px; cursor: pointer;">
+                        </div>
+                        <div>
+                            <label for="themeUITextColor" style="font-size: 0.8rem;">Color Textos de la Web</label>
+                            <input type="color" id="themeUITextColor" value="#ffffff"
+                                style="width: 100%; height: 40px; cursor: pointer;">
+                        </div>
+                        <div>
+                            <label for="themeSiteTitleColor" style="font-size: 0.8rem;">Color Título Principal</label>
+                            <input type="color" id="themeSiteTitleColor" value="#ffffff"
+                                style="width: 100%; height: 40px; cursor: pointer;">
+                        </div>
+                    </div>
+
+                    <h4 style="margin-bottom: 0.5rem; color: var(--color-primary);">📝 Textos Web y Logo</h4>
+
+                    <div
+                        style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--color-border);">
+                        <label for="textSiteTitle"
+                            style="font-size: 0.8rem; font-weight: bold; color: var(--color-primary);">Título (Oculto si
+                            hay Logo)</label>
+                        <input type="text" id="textSiteTitle" value="La Sexta" autocomplete="off"
+                            style="margin-bottom: 1rem;">
+
+                        <label for="logoUpload"
+                            style="font-size: 0.8rem; font-weight: bold; color: var(--color-primary);">Sube un Logotipo
+                            (.png transparente)</label>
+                        <input type="file" id="logoUpload" accept="image/png"
+                            style="width: 100%; padding: 0.5rem; background: rgba(255,255,255,0.05); color: white; border-radius: 4px; margin-bottom: 0.5rem;">
+                        <img id="logoPreview" class="preview-image" alt="Vista preview del logo"
+                            style="max-height: 80px; width: auto;">
+                    </div>
+
+                    <label for="textSiteSub" style="font-size: 0.8rem;">Subtítulo Encabezado</label>
+                    <input type="text" id="textSiteSub" value="Personaliza tu banner de Twitter al instante"
+                        autocomplete="off" style="margin-bottom: 0.5rem;">
+
+                    <label for="textInputLabel" style="font-size: 0.8rem;">Etiqueta de Input</label>
+                    <input type="text" id="textInputLabel" value="Tu Nombre" autocomplete="off"
+                        style="margin-bottom: 0.5rem;">
+
+                    <label for="textBtn" style="font-size: 0.8rem;">Texto Botón Descarga</label>
+                    <input type="text" id="textBtn" value="Descargar Banner" autocomplete="off"
+                        style="margin-bottom: 0.5rem;">
+
+                    <h4 style="margin-bottom: 0.5rem; margin-top: 1rem; color: var(--color-primary);">🏷️ Hashtags de
+                        Banner</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label for="textHashTop" style="font-size: 0.8rem;">Hashtag Esquina Superior</label>
+                            <input type="text" id="textHashTop" value="#SOMOSESTRAL" autocomplete="off">
+                        </div>
+                        <div>
+                            <label for="textHashBot" style="font-size: 0.8rem;">Hashtag Esquina Inferior</label>
+                            <input type="text" id="textHashBot" value="#VOLARDENOVO" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom: 0.5rem; margin-top: 1rem; color: var(--color-primary);">🌐 Redes Sociales</h4>
+                <p style="color: var(--color-text-sub); font-size: 0.8rem; margin-bottom: 1rem;">Deja en blanco el campo
+                    si quieres ocultar el ícono en la web.</p>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label for="linkX" style="font-size: 0.8rem;">URL de X / Twitter</label>
+                        <input type="text" id="linkX" placeholder="https://x.com/tu_cuenta" autocomplete="off"
+                            style="width: 100%;">
+                    </div>
+                    <div>
+                        <label for="linkIg" style="font-size: 0.8rem;">URL de Instagram</label>
+                        <input type="text" id="linkIg" placeholder="https://instagram.com/tu_cuenta" autocomplete="off"
+                            style="width: 100%;">
+                    </div>
+                    <div>
+                        <label for="linkWeb" style="font-size: 0.8rem;">URL de Página Web</label>
+                        <input type="text" id="linkWeb" placeholder="https://www.tusitio.com" autocomplete="off"
+                            style="width: 100%;">
+                    </div>
+                </div>
+
+                <button id="saveThemeBtn" class="primary-btn"
+                    style="margin-top: 1rem; background: #28a745; border-color: #28a745;">💾 Guardar Tema
+                    Visual</button>
+                <button id="resetThemeBtn" class="primary-btn danger-btn" style="margin-top: 1rem;">Restaurar Textos
+                    y Colores Originales</button>
+
+                <!-- Pestaña 3: Gestión de Usuarios (Solo Admin) -->
+                <div class="glass-panel hidden" id="userManagementPanel" style="margin-top: 2rem;">
+                    <div class="input-group">
+                        <h3>3. Gestión de Administradores</h3>
+                        <p style="color: var(--color-text-sub); font-size: 0.9rem; margin-bottom: 1.5rem;">Añade
+                            nuevos usuarios para darles acceso a este panel.</p>
+
+                        <div
+                            style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--color-border); margin-bottom: 1.5rem;">
+                            <h4 style="color: var(--color-primary); margin-bottom: 1rem;">Agregar Nuevo Usuario</h4>
+
+                            <label for="newUsername" style="font-size: 0.85rem;">Nombre de Usuario</label>
+                            <input type="text" id="newUsername" placeholder="Ej: disenador_juan" autocomplete="off"
+                                style="margin-bottom: 1rem;">
+
+                            <label for="newPassword" style="font-size: 0.85rem;">Contraseña</label>
+                            <input type="text" id="newPassword" placeholder="Ej: pass123" autocomplete="off"
+                                style="margin-bottom: 1rem;">
+
+                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.85rem;">
+                                <label><input type="checkbox" id="permBg" checked> Cambiar Fondos</label>
+                                <label><input type="checkbox" id="permTheme" checked> Cambiar Apariencia</label>
+                            </div>
+
+                            <button id="createUserBtn" class="primary-btn"
+                                style="background: #28a745; border-color: #28a745; margin-top: 0.5rem;">➕ Crear
+                                Usuario</button>
+                            <p id="userMsg" style="font-size: 0.85rem; margin-top: 1rem; color: #a4ffb0;"
+                                class="hidden"></p>
+                        </div>
+
+                        <h4 style="margin-bottom: 1rem; color: var(--color-text-main);">Usuarios Actuales</h4>
+                        <div id="userListContainer" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <!-- User list will be injected here by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <a href="index.html"
+                    style="color: var(--color-text-sub); text-align: center; margin-top: 2rem; display: block; text-decoration: none; font-size: 0.9rem;">←
+                    Volver al Generador</a>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>
