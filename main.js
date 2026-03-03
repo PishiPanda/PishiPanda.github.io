@@ -4,7 +4,40 @@ const CANVAS_HEIGHT = 500;
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('bannerCanvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');    // --- MULTI-LANGUAGE DICTIONARY ---
+    const translations = {
+        es: {
+            siteSubtitle: "Personaliza tu banner de Twitter al instante",
+            inputLabel: "Tu Nombre",
+            inputPlaceholder: "Escribe tu nombre aquí",
+            colorLabel: "Color del Texto",
+            downloadBtn: "Descargar Banner",
+            previewLabel: "VISTA PREVIA (1500x500 px)",
+            defaultName: "TU NOMBRE"
+        },
+        en: {
+            siteSubtitle: "Customize your Twitter banner instantly",
+            inputLabel: "Your Name",
+            inputPlaceholder: "Type your name here",
+            colorLabel: "Text Color",
+            downloadBtn: "Download Banner",
+            previewLabel: "PREVIEW (1500x500 px)",
+            defaultName: "YOUR NAME"
+        },
+        pt: {
+            siteSubtitle: "Personalize seu banner do Twitter instantaneamente",
+            inputLabel: "Seu Nome",
+            inputPlaceholder: "Digite seu nome aqui",
+            colorLabel: "Cor do Texto",
+            downloadBtn: "Baixar Banner",
+            previewLabel: "PRÉ-VISUALIZAÇÃO (1500x500 px)",
+            defaultName: "SEU NOME"
+        }
+    };
+
+    let currentLang = localStorage.getItem('lasexta_lang') || 'es';
+
+    // UI Elements
     const nameInput = document.getElementById('nameInput');
     const bannerColorPicker = document.getElementById('bannerColorPicker');
     const colorHexDisplay = document.getElementById('colorHexDisplay');
@@ -13,6 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Variables para configuración global
     let customBgImage = null;
     let customBgLoaded = false;
+    let defaultBgImage = new Image();
+    let defaultBgLoaded = false;
+    defaultBgImage.onload = () => {
+        defaultBgLoaded = true;
+        // Solo redibujar si no hay un custom bg ya cargado
+        if (!customBgLoaded && ctx) drawBanner(nameInput ? nameInput.value : 'Tu Nombre');
+    };
+    defaultBgImage.src = 'default_banner_bg.png';
+
     let globalThemeConfig = {
         hashTop: '#SOMOSESTRAL',
         hashBot: '#VOLARDENOVO',
@@ -143,6 +185,53 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBanner(nameInput.value || 'Tu Nombre');
     });
 
+    // Init UI Language
+    switchLanguage(currentLang);
+
+    // Language switch listeners
+    const langBtns = document.querySelectorAll('.lang-btn');
+    langBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const selectedLang = e.target.getAttribute('data-lang');
+            switchLanguage(selectedLang);
+        });
+    });
+
+    function switchLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('lasexta_lang', lang);
+
+        // Update active button classes
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            if (btn.getAttribute('data-lang') === lang) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        const strings = translations[lang];
+
+        // Replace texts with data-i18n
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (strings[key]) {
+                el.innerText = strings[key];
+            }
+        });
+
+        // Replace placeholders with data-i18n-placeholder
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (strings[key]) {
+                el.placeholder = strings[key];
+            }
+        });
+
+        // Redraw canvas with the new default string if the input is empty
+        if (ctx) drawBanner(nameInput.value);
+    }
+
     // Event listeners
     nameInput.addEventListener('input', (e) => {
         drawBanner(e.target.value);
@@ -164,16 +253,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (customBgLoaded && customBgImage) {
             // Dibujar fondo personalizado si existe
             ctx.drawImage(customBgImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        } else if (defaultBgLoaded && defaultBgImage) {
+            // Dibujar el fondo oficial proporcionado
+            ctx.drawImage(defaultBgImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         } else {
-            // 1. Dibujar fondo premium por defecto
+            // Fallback (mientras carga la imagen oficial)
             drawBackground();
-
-            // 2. Dibujar elementos gráficos abstractos por defecto
             drawAbstractElements();
         }
 
         // 3. Dibujar el texto centrado
-        drawText(nameStr || 'Tu Nombre');
+        drawText(nameStr || translations[currentLang].defaultName);
     }
 
     function drawBackground() {

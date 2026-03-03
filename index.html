@@ -35,9 +35,16 @@
             <a href="admin.html" style="text-decoration: none;">
                 <h1 class="logo" id="siteTitle">La Sexta</h1>
             </a>
-            <p class="subtitle" id="siteSubtitle">Personaliza tu banner de Twitter al instante</p>
+            <p class="subtitle" id="siteSubtitle" data-i18n="siteSubtitle">Personaliza tu banner de Twitter al instante</p>
 
-            <div class="social-links" id="socialLinksContainer">
+            <div class="header-controls">
+                <div class="language-switcher">
+                    <button class="lang-btn active" data-lang="es">ES</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="pt">PT</button>
+                </div>
+
+                <div class="social-links" id="socialLinksContainer">
                 <a href="https://x.com" id="iconX" class="social-icon" target="_blank" aria-label="Twitter / X">
                     <svg viewBox="0 0 24 24" fill="currentColor">
                         <path
@@ -61,18 +68,19 @@
                     </svg>
                 </a>
             </div>
+            </div>
         </header>
 
         <main class="main-content">
             <div class="controls-panel glass-panel">
                 <div class="input-group">
-                    <label for="nameInput" id="inputLabel">Tu Nombre</label>
-                    <input type="text" id="nameInput" placeholder="Escribe tu nombre aquí" autocomplete="off"
+                    <label for="nameInput" id="inputLabel" data-i18n="inputLabel">Tu Nombre</label>
+                    <input type="text" id="nameInput" placeholder="Escribe tu nombre aquí" data-i18n-placeholder="inputPlaceholder" autocomplete="off"
                         maxlength="20">
                 </div>
 
                 <div class="input-group">
-                    <label for="bannerColorPicker">Color del Texto</label>
+                    <label for="bannerColorPicker" data-i18n="colorLabel">Color del Texto</label>
                     <div class="color-picker-wrapper">
                         <input type="color" id="bannerColorPicker" value="#ff5500" class="custom-color-input">
                         <span class="color-hex-display" id="colorHexDisplay">#ff5500</span>
@@ -86,7 +94,7 @@
                         <polyline points="7 10 12 15 17 10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
-                    <span id="downloadBtnText">Descargar Banner</span>
+                    <span id="downloadBtnText" data-i18n="downloadBtn">Descargar Banner</span>
                 </button>
             </div>
 
@@ -95,7 +103,7 @@
                     <!-- El tamaño real en JS será 1500x500 -->
                     <canvas id="bannerCanvas"></canvas>
                 </div>
-                <div class="preview-label" id="previewLabel">Vista Previa (1500x500 px)</div>
+                <div class="preview-label" id="previewLabel" data-i18n="previewLabel">Vista Previa (1500x500 px)</div>
             </div>
         </main>
     </div>
