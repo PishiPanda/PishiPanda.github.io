@@ -11,27 +11,33 @@ document.addEventListener('DOMContentLoaded', () => {
             inputLabel: "Tu Nombre",
             inputPlaceholder: "Escribe tu nombre aquí",
             colorLabel: "Color del Texto",
+            countryLabel: "Selecciona tu Región",
             downloadBtn: "Descargar Banner",
             previewLabel: "VISTA PREVIA (1500x500 px)",
-            defaultName: "TU NOMBRE"
+            defaultName: "TU NOMBRE",
+            mx: "México", ar: "Argentina", br: "Brasil"
         },
         en: {
             siteSubtitle: "Customize your Twitter banner instantly",
             inputLabel: "Your Name",
             inputPlaceholder: "Type your name here",
             colorLabel: "Text Color",
+            countryLabel: "Select your Region",
             downloadBtn: "Download Banner",
             previewLabel: "PREVIEW (1500x500 px)",
-            defaultName: "YOUR NAME"
+            defaultName: "YOUR NAME",
+            mx: "Mexico", ar: "Argentina", br: "Brazil"
         },
         pt: {
             siteSubtitle: "Personalize seu banner do Twitter instantaneamente",
             inputLabel: "Seu Nome",
             inputPlaceholder: "Digite seu nome aqui",
             colorLabel: "Cor do Texto",
+            countryLabel: "Selecione sua Região",
             downloadBtn: "Baixar Banner",
             previewLabel: "PRÉ-VISUALIZAÇÃO (1500x500 px)",
-            defaultName: "SEU NOME"
+            defaultName: "SEU NOME",
+            mx: "México", ar: "Argentina", br: "Brasil"
         }
     };
 
@@ -46,18 +52,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Variables para configuración global
     let customBgImage = null;
     let customBgLoaded = false;
+    let countryBgImages = {};
+    let currentCountry = 'default'; // 'mx', 'ar', 'br', or 'default'
+
+    // Attempt to preload country images
+    ['mx', 'ar', 'br'].forEach(country => {
+        const img = new Image();
+        img.src = `bg_${country}.png`;
+        img.onload = () => { countryBgImages[country] = img; };
+    });
+
+    // Also reload the generic default one just to ensure it's loaded as fallback
     let defaultBgImage = new Image();
     let defaultBgLoaded = false;
     defaultBgImage.onload = () => {
         defaultBgLoaded = true;
+        countryBgImages['default'] = defaultBgImage;
         // Solo redibujar si no hay un custom bg ya cargado
         if (!customBgLoaded && ctx) drawBanner(nameInput ? nameInput.value : 'Tu Nombre');
     };
     defaultBgImage.src = 'default_banner_bg.png';
 
     let globalThemeConfig = {
-        hashTop: '#SOMOSESTRAL',
-        hashBot: '#VOLARDENOVO',
         gradTop: '#ff9900',
         gradMid: '#ff4400',
         gradBot: '#990000',
@@ -112,8 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (downloadBtnText && config.texts.btnText) downloadBtnText.innerText = config.texts.btnText;
 
                 // Sync Javascript Variables for Canvas
-                globalThemeConfig.hashTop = config.texts.hashTop || globalThemeConfig.hashTop;
-                globalThemeConfig.hashBot = config.texts.hashBot || globalThemeConfig.hashBot;
                 globalThemeConfig.gradTop = config.colors.gradTop || globalThemeConfig.gradTop;
                 globalThemeConfig.gradMid = config.colors.gradMid || globalThemeConfig.gradMid;
                 globalThemeConfig.gradBot = config.colors.gradBot || globalThemeConfig.gradBot;
@@ -155,6 +169,22 @@ document.addEventListener('DOMContentLoaded', () => {
         customBgImage.src = savedBg;
     }
 
+    // Country selection listeners
+    const countryBtns = document.querySelectorAll('.country-btn');
+    countryBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Remove active from all
+            countryBtns.forEach(b => b.classList.remove('active'));
+            // Add to clicked
+            const targetBtn = e.target.closest('.country-btn');
+            targetBtn.classList.add('active');
+
+            // Set current country state and redraw
+            currentCountry = targetBtn.getAttribute('data-country');
+            if (ctx) drawBanner(nameInput.value);
+        });
+    });
+
     // Inicializar tamaño interno del canvas para máxima calidad
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
@@ -164,52 +194,38 @@ document.addEventListener('DOMContentLoaded', () => {
         drawBanner(nameInput.value || 'Tu Nombre');
     });
 
-    // Init UI Language
-    switchLanguage(currentLang);
-
-    // Language switch listeners
-    const langBtns = document.querySelectorAll('.lang-btn');
-    langBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const selectedLang = e.target.getAttribute('data-lang');
-            switchLanguage(selectedLang);
-        });
-    });
-
-    function switchLanguage(lang) {
-        currentLang = lang;
-        localStorage.setItem('lasexta_lang', lang);
+    // --- SISTEMA DE TRADUCCION NUEVO Y SEGURO ---
+    window.setLanguage = function (lang) {
+        localStorage.setItem('lasexta_lang_v3', lang);
 
         // Update active button classes
         document.querySelectorAll('.lang-btn').forEach(btn => {
-            if (btn.getAttribute('data-lang') === lang) {
+            if (btn.innerText.toLowerCase() === lang.toLowerCase()) {
                 btn.classList.add('active');
             } else {
                 btn.classList.remove('active');
             }
         });
 
-        const strings = translations[lang];
-
-        // Replace texts with data-i18n
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            if (strings[key]) {
-                el.innerText = strings[key];
-            }
+        // Translate standard text
+        document.querySelectorAll(`[data-tr-${lang}]`).forEach(el => {
+            el.innerText = el.getAttribute(`data-tr-${lang}`);
         });
 
-        // Replace placeholders with data-i18n-placeholder
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-            const key = el.getAttribute('data-i18n-placeholder');
-            if (strings[key]) {
-                el.placeholder = strings[key];
-            }
+        // Translate placeholders
+        document.querySelectorAll(`[data-plc-${lang}]`).forEach(el => {
+            el.placeholder = el.getAttribute(`data-plc-${lang}`);
         });
 
-        // Redraw canvas with the new default string if the input is empty
-        if (ctx) drawBanner(nameInput.value);
-    }
+        // Ensure Canvas renders default text if empty
+        if (ctx && typeof drawBanner === 'function') {
+            drawBanner(nameInput.value);
+        }
+    };
+
+    // Auto-init language on load
+    const savedLang = localStorage.getItem('lasexta_lang_v3') || 'es';
+    window.setLanguage(savedLang);
 
     // Event listeners
     nameInput.addEventListener('input', (e) => {
@@ -241,21 +257,49 @@ document.addEventListener('DOMContentLoaded', () => {
             drawAbstractElements();
         }
 
+        let defaultName = "TU NOMBRE";
+        const currentLang = localStorage.getItem('lasexta_lang_v3');
+        if (currentLang === 'en') defaultName = "YOUR NAME";
+        if (currentLang === 'br') defaultName = "SEU NOME";
+
         // 3. Dibujar el texto centrado
-        drawText(nameStr || translations[currentLang].defaultName);
+        drawText(nameStr || defaultName);
     }
 
     function drawBackground() {
-        // Gradiente principal oscuro radial central
-        const bgGradient = ctx.createRadialGradient(
-            CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 0,
-            CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH
-        );
-        bgGradient.addColorStop(0, '#1a1a24');
-        bgGradient.addColorStop(1, '#0a0a0c');
-
-        ctx.fillStyle = bgGradient;
+        ctx.fillStyle = globalThemeConfig.gradTop;
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        // --- DRAW EXACT BACKGROUND IMAGE STACKING ---
+        // Priority 1: Admin Custom Background (Saved in localstorage overrides everything)
+        // Priority 2: Selected Country Background (bg_mx.png, bg_ar.png, bg_br.png)
+        // Priority 3: Fallback Generic Default Background (default_banner_bg.png)
+
+        if (customBgLoaded && customBgImage) {
+            drawCoverImage(customBgImage);
+            return;
+        }
+
+        if (currentCountry !== 'default' && countryBgImages[currentCountry]) {
+            drawCoverImage(countryBgImages[currentCountry]);
+            return;
+        }
+
+        if (countryBgImages['default']) {
+            drawCoverImage(countryBgImages['default']);
+            return;
+        }
+
+        // Draw animated abstract gradient if absolute failures
+        drawAbstractGradient();
+    }
+
+    function drawCoverImage(imgSource) {
+        // Logica para hacer que la imagen abarque todo el canvas (cover) sin deformarse
+        const scale = Math.max(CANVAS_WIDTH / imgSource.width, CANVAS_HEIGHT / imgSource.height);
+        const x = (CANVAS_WIDTH / 2) - (imgSource.width / 2) * scale;
+        const y = (CANVAS_HEIGHT / 2) - (imgSource.height / 2) * scale;
+        ctx.drawImage(imgSource, x, y, imgSource.width * scale, imgSource.height * scale);
     }
 
     function drawAbstractElements() {
@@ -294,9 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawText(text) {
-        // --- TEXTO PRINCIPAL (OVERWAVE STYLE) ---
+        // --- TEXTO PRINCIPAL (OVERWAVE RESTAURATION W/ FALLBACK FOR NUMBERS) ---
         let fontSize = 160; // Texto base más grande
-        ctx.font = `400 ${fontSize}px "Overwave", sans-serif`;
+        ctx.font = `400 ${fontSize}px "Overwave", "Outfit", sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
@@ -307,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reducir tamaño de fuente si el texto es muy ancho
         while (ctx.measureText(text.toUpperCase()).width > maxWidth && fontSize > 40) {
             fontSize -= 4;
-            ctx.font = `400 ${fontSize}px "Overwave", sans-serif`;
+            ctx.font = `400 ${fontSize}px "Overwave", "Outfit", sans-serif`;
         }
         // --------------------------
 
@@ -323,21 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.letterSpacing = '5px';
 
         ctx.fillText(text.toUpperCase(), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-
-        // Hastag inferior izquierdo
-        ctx.shadowBlur = 0; // Quitar glow para texto pequeño
-        ctx.font = '600 22px "Outfit", sans-serif';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.textAlign = 'left';
-        ctx.letterSpacing = '2px';
-        ctx.fillText(globalThemeConfig.hashBot, 60, CANVAS_HEIGHT - 60);
-
-        // Hashtag superior derecho
-        ctx.font = '600 22px "Outfit", sans-serif';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.textAlign = 'right';
-        ctx.letterSpacing = '2px';
-        ctx.fillText(globalThemeConfig.hashTop, CANVAS_WIDTH - 60, 60);
     }
 
     function downloadBanner() {

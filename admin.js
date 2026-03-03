@@ -156,8 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (config.texts.siteSub !== undefined) document.getElementById('textSiteSub').value = config.texts.siteSub;
                     if (config.texts.inputLabel !== undefined) document.getElementById('textInputLabel').value = config.texts.inputLabel;
                     if (config.texts.btnText !== undefined) document.getElementById('textBtn').value = config.texts.btnText;
-                    if (config.texts.hashTop !== undefined) document.getElementById('textHashTop').value = config.texts.hashTop;
-                    if (config.texts.hashBot !== undefined) document.getElementById('textHashBot').value = config.texts.hashBot;
                 }
                 // Populate Social Links
                 if (config.social) {
@@ -279,9 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 siteTitle: document.getElementById('textSiteTitle').value,
                 siteSub: document.getElementById('textSiteSub').value,
                 inputLabel: document.getElementById('textInputLabel').value,
-                btnText: document.getElementById('textBtn').value,
-                hashTop: document.getElementById('textHashTop').value,
-                hashBot: document.getElementById('textHashBot').value
+                btnText: document.getElementById('textBtn').value
             },
             social: {
                 linkX: document.getElementById('linkX').value,

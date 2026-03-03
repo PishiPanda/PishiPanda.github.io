@@ -468,6 +468,54 @@ input[type="text"]:focus {
     text-transform: uppercase;
 }
 
+/* --- COMPONENTES ESPECÍFICOS --- */
+
+.country-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.country-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-border);
+    padding: 0.8rem 0.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--color-text-sub);
+}
+
+.country-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.country-btn.active {
+    background: rgba(255, 102, 0, 0.15);
+    /* Tint sutil primario */
+    border-color: var(--color-primary);
+    box-shadow: 0 0 10px rgba(255, 102, 0, 0.3);
+}
+
+.flag-icon-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.country-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
 /* Button */
 .primary-btn {
     display: flex;
@@ -616,5 +664,22 @@ canvas {
 
     .custom-color-input {
         width: 100%;
+    }
+
+    .country-selector {
+        gap: 0.3rem;
+    }
+
+    .country-btn {
+        padding: 0.6rem 0.2rem;
+    }
+
+    .flag-icon-img {
+        width: 24px;
+        height: auto;
+    }
+
+    .country-name {
+        font-size: 0.72rem;
     }
 }
