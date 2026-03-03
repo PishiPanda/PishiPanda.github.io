@@ -125,27 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sb = parseInt(sHex.substring(4, 6), 16);
                 globalThemeConfig.textShadow = `rgba(${sr}, ${sg}, ${sb}, 0.8)`;
 
-                // Apply Social Links
-                if (config.social) {
-                    const iconX = document.getElementById('iconX');
-                    if (iconX) {
-                        if (config.social.linkX === '') { iconX.style.display = 'none'; }
-                        else if (config.social.linkX) { iconX.style.display = 'flex'; iconX.href = config.social.linkX; }
-                    }
-
-                    const iconIg = document.getElementById('iconIg');
-                    if (iconIg) {
-                        if (config.social.linkIg === '') { iconIg.style.display = 'none'; }
-                        else if (config.social.linkIg) { iconIg.style.display = 'flex'; iconIg.href = config.social.linkIg; }
-                    }
-
-                    const iconWeb = document.getElementById('iconWeb');
-                    if (iconWeb) {
-                        if (config.social.linkWeb === '') { iconWeb.style.display = 'none'; }
-                        else if (config.social.linkWeb) { iconWeb.style.display = 'flex'; iconWeb.href = config.social.linkWeb; }
-                    }
-                }
-
             } catch (e) {
                 console.error("Error parsing theme config", e);
             }
