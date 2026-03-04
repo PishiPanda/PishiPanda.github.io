@@ -5,6 +5,14 @@
     src: local('Overwave'), url('https://fonts.cdnfonts.com/s/53957/Overwave-AL6AL.woff') format('woff');
 }
 
+@font-face {
+    font-family: 'DharmaGothic';
+    font-style: italic;
+    font-weight: 800;
+    /* ExtraBold */
+    src: local('Dharma Gothic E ExBold Italic'), url('./DHARMAGOTHICE-EXBOLDITALIC.TTF') format('truetype');
+}
+
 :root {
     --color-bg-base: #141313;
     --color-bg-panel: rgba(26, 25, 25, 0.7);

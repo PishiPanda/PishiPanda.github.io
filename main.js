@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let customBgImage = null;
     let customBgLoaded = false;
     let countryBgImages = {};
-    let currentCountry = 'default'; // 'mx', 'ar', 'br', or 'default'
+    let currentCountry = 'default'; // 'mx', 'ar', 'br', 'ec', 'col', 'vzla', 'cl', 'pe', 'esp', or 'default'
 
     // Attempt to preload country images
-    ['mx', 'ar', 'br'].forEach(country => {
+    ['mx', 'ar', 'br', 'ec', 'col', 'vzla', 'cl', 'pe', 'esp'].forEach(country => {
         const img = new Image();
         img.src = `bg_${country}.png`;
         img.onload = () => { countryBgImages[country] = img; };
@@ -68,10 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
     defaultBgImage.onload = () => {
         defaultBgLoaded = true;
         countryBgImages['default'] = defaultBgImage;
-        // Solo redibujar si no hay un custom bg ya cargado
-        if (!customBgLoaded && ctx) drawBanner(nameInput ? nameInput.value : 'Tu Nombre');
+        if (ctx) drawBanner(nameInput ? nameInput.value : 'Tu Nombre');
     };
-    defaultBgImage.src = 'default_banner_bg.png';
+    defaultBgImage.src = 'bg_mx.png'; // Usar un banner real por defecto
 
     let globalThemeConfig = {
         gradTop: '#ff9900',
@@ -157,17 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Call it before canvas drawing
     applyGlobalTheme();
 
-    // Intentar cargar fondo del BANNER de localStorage
-    const savedBg = localStorage.getItem('customLaSextaBg');
-    if (savedBg) {
-        customBgImage = new Image();
-        customBgImage.onload = () => {
-            customBgLoaded = true;
-            // Redibujar una vez cargada para asegurar que se muestre en el primer render
-            if (ctx) drawBanner(nameInput ? nameInput.value : 'Tu Nombre');
-        };
-        customBgImage.src = savedBg;
-    }
+    // PURGAR FONDOS DE PRUEBA DEL ADMIN QUE ESTAN BLOQUEANDO A LOS PAISES
+    localStorage.removeItem('customLaSextaBg');
+    customBgImage = null;
+    customBgLoaded = false;
 
     // Country selection listeners
     const countryBtns = document.querySelectorAll('.country-btn');
@@ -248,13 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (customBgLoaded && customBgImage) {
             // Dibujar fondo personalizado si existe
             ctx.drawImage(customBgImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        } else if (defaultBgLoaded && defaultBgImage) {
-            // Dibujar el fondo oficial proporcionado
-            ctx.drawImage(defaultBgImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         } else {
-            // Fallback (mientras carga la imagen oficial)
             drawBackground();
-            drawAbstractElements();
         }
 
         let defaultName = "TU NOMBRE";
@@ -271,14 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         // --- DRAW EXACT BACKGROUND IMAGE STACKING ---
-        // Priority 1: Admin Custom Background (Saved in localstorage overrides everything)
-        // Priority 2: Selected Country Background (bg_mx.png, bg_ar.png, bg_br.png)
-        // Priority 3: Fallback Generic Default Background (default_banner_bg.png)
-
-        if (customBgLoaded && customBgImage) {
-            drawCoverImage(customBgImage);
-            return;
-        }
+        // Priority 1: Selected Country Background (bg_mx.png, bg_ar.png, bg_br.png, etc)
+        // Priority 2: Fallback Generic Default Background (default_banner_bg.png)
 
         if (currentCountry !== 'default' && countryBgImages[currentCountry]) {
             drawCoverImage(countryBgImages[currentCountry]);
@@ -290,8 +271,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Draw animated abstract gradient if absolute failures
-        drawAbstractGradient();
+        // Draw animated abstract elements if absolute failures
+        drawAbstractElements();
     }
 
     function drawCoverImage(imgSource) {
@@ -339,19 +320,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function drawText(text) {
         // --- TEXTO PRINCIPAL (OVERWAVE RESTAURATION W/ FALLBACK FOR NUMBERS) ---
-        let fontSize = 160; // Texto base más grande
-        ctx.font = `400 ${fontSize}px "Overwave", "Outfit", sans-serif`;
-        ctx.textAlign = 'center';
+        let fontSize = 210; // Texto base inicial
+        ctx.font = `italic 800 ${fontSize}px "DharmaGothic", "Overwave", "Outfit", sans-serif`;
+        // Cambio de alineación al centro izquierdo del bounding box según la imagen
+        ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
 
-        // --- AUTO-SCALING LOGIC ---
-        // Max width permitido para el nombre (dejando 100px de padding por lado)
-        const maxWidth = CANVAS_WIDTH - 200;
+        // --- BOUNDING BOX SETTINGS (BASADO EN RECUADRO ROJO) ---
+        // Coordenadas estimadas de la caja roja en un canvas 1500x500 (100% escala)
+        const boxX = CANVAS_WIDTH * 0.45; // Empieza aprox 45% a la derecha (dejando espacio para la bandera)
+        const boxY = CANVAS_HEIGHT * 0.4; // Ajuste vertical
+        const boxWidth = CANVAS_WIDTH * 0.52; // Ancho máximo permitido del recuadro rojo
 
-        // Reducir tamaño de fuente si el texto es muy ancho
-        while (ctx.measureText(text.toUpperCase()).width > maxWidth && fontSize > 40) {
+        // Reducir tamaño de fuente si el texto es más ancho que el boxWidth
+        while (ctx.measureText(text.toUpperCase()).width > boxWidth && fontSize > 30) {
             fontSize -= 4;
-            ctx.font = `400 ${fontSize}px "Overwave", "Outfit", sans-serif`;
+            ctx.font = `italic 800 ${fontSize}px "DharmaGothic", "Overwave", "Outfit", sans-serif`;
         }
         // --------------------------
 
@@ -366,24 +350,27 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.shadowOffsetY = 0;
         ctx.letterSpacing = '5px';
 
-        ctx.fillText(text.toUpperCase(), CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+        ctx.fillText(text.toUpperCase(), boxX, boxY);
     }
 
     function downloadBanner() {
         // Convertir canvas a URL local de data base64 (Formato Image/PNG)
-        // Y forzar decarga con API de <a> 
+        try {
+            const dataURL = canvas.toDataURL('image/png', 1.0);
+            const a = document.createElement('a');
 
-        const dataURL = canvas.toDataURL('image/png', 1.0);
-        const a = document.createElement('a');
+            const nameVal = nameInput.value.trim();
+            const suffix = nameVal ? `_${nameVal.replace(/\s+/g, '')}` : '';
 
-        const nameVal = nameInput.value.trim();
-        const suffix = nameVal ? `_${nameVal.replace(/\s+/g, '')}` : '';
+            a.href = dataURL;
+            a.download = `Banner_LaSexta${suffix}.png`;
 
-        a.href = dataURL;
-        a.download = `Banner_LaSexta${suffix}.png`;
-
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (e) {
+            console.error("Canvas Download Blocked:", e);
+            alert("⚠️ BLOQUEO DE SEGURIDAD DEL NAVEGADOR\\n\\nTu navegador (Chrome) bloquea las descargas automáticas cuando abres los archivos directamente desde tu disco.\\n\\nSOLUCIÓN DEFINITIVA:\\nVe a la carpeta de tu proyecto y haz DOBLE CLIC en el archivo 'INICIAR_GENERADOR.bat'. Eso abrirá la página correctamente y ¡el botón de descargar funcionará perfecto!");
+        }
     }
 });
